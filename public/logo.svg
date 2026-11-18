@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <defs>
+    <linearGradient id="vb-grad-border" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="50%" stop-color="#6366F1"/>
+      <stop offset="100%" stop-color="#A855F7"/>
+    </linearGradient>
+    <linearGradient id="vb-grad-fill" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F172A"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </linearGradient>
+    <linearGradient id="vb-grad-accent1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="100%" stop-color="#6366F1"/>
+    </linearGradient>
+    <linearGradient id="vb-grad-accent2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#818CF8"/>
+      <stop offset="100%" stop-color="#C084FC"/>
+    </linearGradient>
+    <filter id="vb-glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Container Box -->
+  <rect x="8" y="8" width="104" height="104" rx="28" fill="url(#vb-grad-fill)" stroke="url(#vb-grad-border)" stroke-width="2.5"/>
+
+  <!-- Left Bracket < -->
+  <path d="M38 42L25 60L38 78" stroke="url(#vb-grad-accent1)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Right Bracket > -->
+  <path d="M82 42L95 60L82 78" stroke="url(#vb-grad-accent2)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Center Slash / -->
+  <path d="M54 80L66 40" stroke="url(#vb-grad-border)" stroke-width="5.5" stroke-linecap="round"/>
+
+  <!-- Subtle glow dot in center -->
+  <circle cx="60" cy="60" r="3" fill="#38BDF8" filter="url(#vb-glow)"/>
+</svg>
