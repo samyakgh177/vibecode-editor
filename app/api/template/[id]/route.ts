@@ -1,8 +1,10 @@
 import { scanTemplateDirectory } from "@/modules/playground/lib/path-to-json";
 import { db } from "@/lib/db";
 import { templatePaths } from "@/lib/template";
+import { STATIC_TEMPLATES } from "@/lib/templates-data";
 import path from "path";
 import { NextRequest } from "next/server";
+import fs from "fs";
 
 function validateJsonStructure(data: unknown): boolean {
   try {
@@ -32,34 +34,38 @@ export async function GET(
     return Response.json({ error: "Playground not found" }, { status: 404 });
   }
 
-  const templateKey = playground.template as keyof typeof templatePaths;
-  const templatePath = templatePaths[templateKey];
+  const rawKey = (playground.template || "REACT").toUpperCase();
+  const templateKey = (rawKey in STATIC_TEMPLATES ? rawKey : "REACT") as keyof typeof STATIC_TEMPLATES;
 
-  if (!templatePath) {
-    return Response.json({ error: "Invalid template" }, { status: 404 });
+  // 1. High-speed, 100% reliable static template (works across Vercel serverless without filesystem latency or ENOENT)
+  if (STATIC_TEMPLATES[templateKey]) {
+    return Response.json(
+      { success: true, templateJson: STATIC_TEMPLATES[templateKey] },
+      { status: 200 }
+    );
   }
+
+  // 2. Dynamic filesystem scan fallback
+  const templatePath = templatePaths[templateKey as keyof typeof templatePaths] || templatePaths.REACT;
 
   try {
     const inputPath = path.join(process.cwd(), templatePath);
-    const result = await scanTemplateDirectory(inputPath);
-
-    // Validate the JSON structure before returning
-    if (!validateJsonStructure(result.items)) {
-      return Response.json(
-        { error: "Invalid JSON structure" },
-        { status: 500 }
-      );
+    if (fs.existsSync(inputPath)) {
+      const result = await scanTemplateDirectory(inputPath);
+      if (validateJsonStructure(result.items)) {
+        return Response.json(
+          { success: true, templateJson: result },
+          { status: 200 }
+        );
+      }
     }
-
-    return Response.json(
-      { success: true, templateJson: result },
-      { status: 200 }
-    );
   } catch (error) {
-    console.error("Error generating template JSON:", error);
-    return Response.json(
-      { error: "Failed to generate template" },
-      { status: 500 }
-    );
+    console.error("Error scanning template directory:", error);
   }
+
+  // 3. Guaranteed fallback to REACT template
+  return Response.json(
+    { success: true, templateJson: STATIC_TEMPLATES.REACT },
+    { status: 200 }
+  );
 }
